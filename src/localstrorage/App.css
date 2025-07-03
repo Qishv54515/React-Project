@@ -1,0 +1,228 @@
+/* Global Styling */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f1f3f4;
+}
+
+/* Main App Container */
+.App {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Flex Wrapper for Form + Table */
+.flex-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: space-between;
+}
+
+/* Form Styling */
+.form-container {
+  flex: 1;
+  min-width: 300px;
+  padding: 20px;
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.form-container label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-container input[type="text"],
+.form-container input[type="number"],
+.form-container select,
+.form-container input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  background-color: #fff;
+  transition: border 0.3s ease;
+}
+
+.form-container input:focus,
+.form-container select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.form-container input[type="radio"],
+.form-container input[type="checkbox"] {
+  margin-right: 6px;
+  margin-left: 10px;
+  transform: scale(1.15);
+}
+
+/* Buttons */
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin-right: 10px;
+}
+
+button:hover {
+  transform: scale(1.02);
+}
+
+.btn-primary {
+  background-color: #fdd835;
+  color: #000;
+}
+
+.btn-primary:hover {
+  background-color: #fbc02d;
+}
+
+.btn-danger {
+  background-color: #ef5350;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #d32f2f;
+}
+
+.btn-secondary {
+  background-color: #64b5f6;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #42a5f5;
+}
+
+/* Data Table Styling */
+.data-container {
+  flex: 2;
+  min-width: 600px;
+  padding: 20px;
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+table th,
+table td {
+  border: 1px solid #ddd;
+  padding: 12px 10px;
+  text-align: center;
+  font-size: 14px;
+}
+
+table th {
+  background-color: #1976d2;
+  color: white;
+  font-weight: bold;
+}
+
+table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+table tr:hover {
+  background-color: #e3f2fd;
+}
+
+table td img {
+  border-radius: 8px;
+  max-width: 50px;
+  max-height: 50px;
+}
+
+/* Pagination */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pagination-controls button {
+  padding: 8px 14px;
+  border: 1px solid #007bff;
+  background-color: #fff;
+  color: #007bff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.pagination-controls button:disabled {
+  background-color: #f0f0f0;
+  color: #999;
+  border-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination-controls span {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .data-container {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-container {
+    padding: 16px;
+  }
+
+  .form-container input,
+  .form-container select {
+    font-size: 14px;
+  }
+
+  .data-container {
+    overflow-x: scroll;
+  }
+
+  .pagination-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
