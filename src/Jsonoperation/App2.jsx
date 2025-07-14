@@ -11,26 +11,30 @@ const App2 = () => {
   const [Skills, setSkills] = useState([]);
   const [Gender, setGender] = useState("");
   const [allData, setAllData] = useState([]);
+  const [editId, setEditId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
-  // ✅ Fetch all data from JSON server
-  useEffect(() => {
+  const fetchData = () => {
     fetch("http://localhost:4000/userData")
       .then((res) => res.json())
-      .then((data) => {
-        setAllData(data);
-      })
+      .then((data) => setAllData(data))
       .catch((err) => {
         console.error("Error fetching data:", err);
         toast.error("Failed to load data");
       });
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
-  const handleSkillchange = (e) => {
+  const handleSkillChange = (e) => {
     const { value, checked } = e.target;
     if (checked) {
-      setSkills([...Skills, value]);
+      setSkills((prev) => [...prev, value]);
     } else {
-      setSkills(Skills.filter((skill) => skill !== value));
+      setSkills((prev) => prev.filter((skill) => skill !== value));
     }
   };
 
@@ -40,26 +44,24 @@ const App2 = () => {
     setRole("");
     setGender("");
     setSkills([]);
+    setEditId(null);
   };
-
-  const saveData = (newEntry) => {
-    fetch("http://localhost:4000/userData", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newEntry),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Information is not added");
-        return res.json();
-      })
-      .then((addData) => {
-        setAllData((prev) => [...prev, addData]);
-        toast.success("Data is added");
-      })
-      .catch((err) => {
-        console.error("Error:", err.message);
-        toast.error("Failed to add data");
-      });
+  const handleView = (id) => {
+    const Employee = allData.find((item) => item.id === id);
+    if (Employee) {
+      toast.info(
+  `Name: ${ Employee.Name}\nAge: ${Employee.Age}\nRole: ${Employee.Role}\nSkills: ${Employee.Skills.join(", ")}\nGender: ${Employee.Gender}`,
+      {
+        position: "top-center",
+        autoClose: 5000,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable:true,
+        height : 100,
+        width: 100,
+      }
+    );
+    }
   };
 
   const handleSubmit = () => {
@@ -69,7 +71,6 @@ const App2 = () => {
     }
 
     const newEntry = {
-      id: Date.now(),
       Name,
       Age,
       Role,
@@ -77,9 +78,62 @@ const App2 = () => {
       Skills,
     };
 
-    saveData(newEntry);
-    handleClear();
+    if (editId) {
+      fetch(`http://localhost:4000/userData/${editId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newEntry),
+      })
+        .then((res) => res.json())
+        .then(() => {
+          toast.success("Updated successfully");
+          fetchData();
+          handleClear();
+        })
+        .catch(() => toast.error("Update failed"));
+    } else {
+      fetch("http://localhost:4000/userData", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newEntry),
+      })
+        .then((res) => res.json())
+        .then(() => {
+          toast.success("Data added successfully");
+          fetchData();
+          handleClear();
+        })
+        .catch(() => toast.error("Add failed"));
+    }
   };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this record?")) {
+      fetch(`http://localhost:4000/userData/${id}`, {
+        method: "DELETE",
+      })
+        .then(() => {
+          toast.success("Deleted successfully");
+          fetchData();
+        })
+        .catch(() => toast.error("Delete failed"));
+    }
+  };
+
+  const handleEdit = (item) => {
+    setEditId(item.id);
+    setName(item.Name);
+    setAge(item.Age);
+    setRole(item.Role);
+    setGender(item.Gender);
+    setSkills(item.Skills);
+  };
+  // Pagination logic
+  const totalPages = Math.ceil(allData.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = allData.slice(indexOfFirstItem, indexOfLastItem);
+
 
   return (
     <>
@@ -87,15 +141,14 @@ const App2 = () => {
       <About />
       <div className="App2">
         <div className="form-container2">
-          {/* FORM */}
           <div>
             <label>
               Name:
               <input
                 type="text"
                 placeholder="Enter your name"
-                onChange={(e) => setName(e.target.value)}
                 value={Name}
+                onChange={(e) => setName(e.target.value)}
               />
             </label>
           </div>
@@ -105,8 +158,8 @@ const App2 = () => {
               <input
                 type="number"
                 placeholder="Enter your age"
-                onChange={(e) => setAge(e.target.value)}
                 value={Age}
+                onChange={(e) => setAge(e.target.value)}
               />
             </label>
           </div>
@@ -117,24 +170,24 @@ const App2 = () => {
                 type="radio"
                 name="gender"
                 value="Male"
-                onChange={(e) => setGender(e.target.value)}
                 checked={Gender === "Male"}
-              />
+                onChange={(e) => setGender(e.target.value)}
+              />{" "}
               Male
               <input
                 type="radio"
                 name="gender"
                 value="Female"
-                onChange={(e) => setGender(e.target.value)}
                 checked={Gender === "Female"}
-              />
+                onChange={(e) => setGender(e.target.value)}
+              />{" "}
               Female
             </label>
           </div>
           <div>
             <label>
               Role:
-              <select onChange={(e) => setRole(e.target.value)} value={Role}>
+              <select value={Role} onChange={(e) => setRole(e.target.value)}>
                 <option value="">--select Role--</option>
                 <option value="Frontend Developer">Frontend Developer</option>
                 <option value="Backend Developer">Backend Developer</option>
@@ -146,26 +199,28 @@ const App2 = () => {
           </div>
           <div>
             Skills:
-            {["HTML", "CSS", "JAVASCRIPT", "REACT.JS", "MONGODB", "PHP"].map(
-              (skill) => (
-                <label key={skill}>
-                  <input
-                    type="checkbox"
-                    value={skill}
-                    onChange={handleSkillchange}
-                    checked={Skills.includes(skill)}
-                  />
-                  {skill}
-                </label>
-              )
-            )}
+            {["HTML", "CSS", "JAVASCRIPT", "REACT.JS", "MONGODB", "PHP"].map((skill) => (
+              <label key={skill}>
+                <input
+                  type="checkbox"
+                  value={skill}
+                  checked={Skills.includes(skill)}
+                  onChange={handleSkillChange}
+                />
+                {skill}
+              </label>
+            ))}
           </div>
 
-          {/* BUTTONS */}
-          <button onClick={handleSubmit}>Add & Save</button>
-          <button onClick={handleClear}>Clear</button>
+          <div>
+            <button className="btn btn-primary" onClick={handleSubmit}>
+              {editId ? "Update" : "Save"}
+            </button>
+            <button className="btn btn-danger" onClick={handleClear}>
+              Clear
+            </button>
+          </div>
 
-          {/* TABLE */}
           <table className="table2">
             <thead>
               <tr>
@@ -176,30 +231,39 @@ const App2 = () => {
                 <th>Role</th>
                 <th>Skills</th>
                 <th>Gender</th>
-                <th>Photo</th>
-                <th>Action</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {allData.map((item, index) => (
+              {currentItems.map((item, index) => (
                 <tr key={item.id}>
-                  <td>{index + 1}</td>
+                  <td>{indexOfFirstItem + index + 1}</td>
                   <td>{item.id}</td>
                   <td>{item.Name}</td>
                   <td>{item.Age}</td>
                   <td>{item.Role}</td>
-                  <td>{item.Skills}</td>
+                  <td>{item.Skills?.join(", ")}</td>
                   <td>{item.Gender}</td>
-                  <td>Photo</td>
-                    {/* <td>
+                  <td>
                     <button className="btn btn-primary" onClick={() => handleView(item.id)}>View</button>
-                    <button className="btn btn-secondary" onClick={() => handleEdit(item.id)}>Edit</button>
+                    <button className="btn btn-secondary" onClick={() => handleEdit(item)}>Edit</button>
                     <button className="btn btn-danger" onClick={() => handleDelete(item.id)}>Delete</button>
-                  </td> */}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <div style={{ marginTop: "15px", display: "flex", justifyContent: "center", gap: "10px" }}>
+            <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
+              Previous
+            </button>
+            <span>
+              Page {currentPage} of {totalPages || 1}
+            </span>
+            <button disabled={currentPage === totalPages || totalPages === 0} onClick={() => setCurrentPage(currentPage + 1)}>
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </>

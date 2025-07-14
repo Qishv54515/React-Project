@@ -28,10 +28,7 @@ function App() {
     if (isDataLoaded)
       localStorage.setItem("employeeData", JSON.stringify(data));
   }, [data, isDataLoaded]);
-
-  // useEffect(()=>{
-  //   getUserData();
-  // },[])
+  
   const handleSkillchange = (e) => {
     const { value, checked } = e.target;
     if (checked) {
